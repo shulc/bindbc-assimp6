@@ -1,0 +1,13 @@
+{
+    "name": "assimp-info",
+    "description": "Smoke test: load libassimp at runtime, import a model, print a summary.",
+    "license": "BSL-1.0",
+
+    "dependencies": {
+        "bindbc-assimp6": { "path": "../.." }
+    },
+
+    "subConfigurations": {
+        "bindbc-assimp6": "dynamic"
+    }
+}

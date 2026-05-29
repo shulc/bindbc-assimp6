@@ -1,0 +1,20 @@
+# DUB
+.dub/
+*.o
+*.obj
+*.lst
+dub.selections.json
+
+# build outputs
+/lib/
+*.a
+*.so
+*.dylib
+*.dll
+
+# example binaries
+examples/*/assimp-info
+examples/*/*-example
+
+# local Claude settings
+.claude/settings.local.json
