@@ -29,6 +29,42 @@ classes are intentionally not bound — use the C entry points (`aiImportFile*`,
   on the loader search path (install via your package manager, or build the
   `extern/assimp` submodule).
 
+## Minimal static libassimp (`tools/build_assimp_min.sh`)
+
+For consumers that only need a subset of formats and want to **static-link**
+assimp (no `libassimp.so.6` runtime dependency), `tools/build_assimp_min.sh`
+CMake-configures + builds assimp with only **OBJ / glTF / FBX** importers *and*
+exporters enabled (all other formats off, tests/tools/samples off, zlib bundled,
+Release). It defaults to a static build and drops the artifacts into `lib/`.
+
+```bash
+git submodule update --init extern/assimp     # source, pinned to v6.0.5
+tools/build_assimp_min.sh                      # static (default) → lib/libassimp.a
+tools/build_assimp_min.sh --shared             # libassimp.so.* instead
+# overridable: ASSIMP_SRC, BUILD_DIR, OUT_DIR, LINK=static|shared
+```
+
+It prints the produced artifact sizes and runs a probe that lists the
+compiled-in export ids and supported import extensions, confirming the bloat
+formats are gone.
+
+**Static link from a D consumer (LDC/DMD).** D drivers link via `cc`/`gcc`, not
+`g++`, so the C++ runtime and zlib must be added explicitly. The minimal correct
+set on Linux:
+
+```jsonc
+// dub.json
+"lflags": [
+    "lib/libassimp.a",
+    "lib/libzlibstatic.a"   // bundled zlib — OR drop this and add "-lz" below
+],
+"libs": [ "stdc++", "m" ]   // "stdc++" is REQUIRED; pthread/dl optional insurance
+```
+
+zlib is genuinely needed (assimp references `inflate*`); satisfy it with the
+bundled `libzlibstatic.a` *or* system `-lz`. `libassimp.a` must appear **before**
+`libzlibstatic.a` / `-lstdc++` on the link line (static-archive ordering).
+
 ## Use
 
 ```d

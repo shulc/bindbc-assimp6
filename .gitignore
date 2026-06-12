@@ -12,6 +12,9 @@ dub.selections.json
 *.dylib
 *.dll
 
+# minimal libassimp build (tools/build_assimp_min.sh)
+/build-min/
+
 # example binaries
 examples/*/assimp-info
 examples/*/*-example
