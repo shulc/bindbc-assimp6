@@ -152,8 +152,7 @@ CFG=(
 
 if is_windows_shell; then
   CFG+=(
-    -DUSE_STATIC_CRT=ON
-    -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
+    -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL
   )
 fi
 

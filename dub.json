@@ -47,7 +47,8 @@
             ],
             "lflags-windows": [
                 "$PACKAGE_DIR/lib/assimp.lib",
-                "$PACKAGE_DIR/lib/zlibstatic.lib"
+                "$PACKAGE_DIR/lib/zlibstatic.lib",
+                "ucrt.lib"
             ],
 
             "libs-linux": ["stdc++", "m"],
