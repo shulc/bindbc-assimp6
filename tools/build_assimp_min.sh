@@ -48,6 +48,18 @@ esac
 # --- resolve source dir -------------------------------------------------------
 if [[ -n "${ASSIMP_SRC:-}" ]]; then
   SRC="$ASSIMP_SRC"
+elif [[ -d "$D_ASSIMP/.git" || -f "$D_ASSIMP/.git" ]]; then
+  if [[ ! -f "$D_ASSIMP/extern/assimp/CMakeLists.txt" ]]; then
+    echo "==> initializing assimp submodule"
+    git -C "$D_ASSIMP" submodule sync --quiet extern/assimp
+    git -C "$D_ASSIMP" submodule update --init --recursive --quiet extern/assimp
+  fi
+  if [[ -f "$D_ASSIMP/extern/assimp/CMakeLists.txt" ]]; then
+    SRC="$D_ASSIMP/extern/assimp"
+  else
+    echo "Cannot find assimp source after submodule init: $D_ASSIMP/extern/assimp" >&2
+    exit 1
+  fi
 elif [[ -f "$D_ASSIMP/extern/assimp/CMakeLists.txt" ]]; then
   SRC="$D_ASSIMP/extern/assimp"
 elif [[ -f "$D_ASSIMP/../assimp/CMakeLists.txt" ]]; then
