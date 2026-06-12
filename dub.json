@@ -48,6 +48,7 @@
             "lflags-windows": [
                 "$PACKAGE_DIR/lib/assimp.lib",
                 "$PACKAGE_DIR/lib/zlibstatic.lib",
+                "/NODEFAULTLIB:libucrt.lib",
                 "ucrt.lib"
             ],
 
