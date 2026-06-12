@@ -74,6 +74,17 @@ SRC="$(cd "$SRC" && pwd)"
 BUILD_DIR="${BUILD_DIR:-$D_ASSIMP/build-min}"
 OUT_DIR="${OUT_DIR:-$D_ASSIMP/lib}"
 
+cmake_path() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      cygpath -w "$1"
+      ;;
+    *)
+      printf '%s\n' "$1"
+      ;;
+  esac
+}
+
 # --- tool checks --------------------------------------------------------------
 command -v cmake >/dev/null || { echo "cmake not found" >&2; exit 1; }
 if command -v ninja >/dev/null; then
@@ -93,6 +104,9 @@ echo "==> build dir    : $BUILD_DIR"
 echo "==> output dir   : $OUT_DIR"
 echo "==> link mode    : $LINK (BUILD_SHARED_LIBS=$BUILD_SHARED)"
 echo "==> jobs         : $JOBS"
+
+CMAKE_SRC="$(cmake_path "$SRC")"
+CMAKE_BUILD_DIR="$(cmake_path "$BUILD_DIR")"
 
 # Assimp's vendored zlib 1.3.1 trips over AppleClang 21's TARGET_OS_MAC
 # predefines: zutil.h takes an old classic-Mac branch, macro-defines fdopen,
@@ -131,14 +145,14 @@ CFG=(
 
 echo
 echo "==> configure:"
-echo "    cmake ${GEN[*]} -S \"$SRC\" -B \"$BUILD_DIR\" ${CFG[*]}"
+echo "    cmake ${GEN[*]} -S \"$CMAKE_SRC\" -B \"$CMAKE_BUILD_DIR\" ${CFG[*]}"
 echo
-cmake "${GEN[@]}" -S "$SRC" -B "$BUILD_DIR" "${CFG[@]}"
+cmake "${GEN[@]}" -S "$CMAKE_SRC" -B "$CMAKE_BUILD_DIR" "${CFG[@]}"
 
 # --- build --------------------------------------------------------------------
 echo
 echo "==> build (-j$JOBS)"
-cmake --build "$BUILD_DIR" -j"$JOBS"
+cmake --build "$CMAKE_BUILD_DIR" -j"$JOBS"
 
 # --- collect artifacts --------------------------------------------------------
 mkdir -p "$OUT_DIR"
