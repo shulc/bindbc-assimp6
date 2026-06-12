@@ -150,6 +150,13 @@ CFG=(
   -DASSIMP_BUILD_ZLIB=$ASSIMP_BUILD_ZLIB
 )
 
+if is_windows_shell; then
+  CFG+=(
+    -DUSE_STATIC_CRT=ON
+    -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
+  )
+fi
+
 echo
 echo "==> configure:"
 echo "    cmake ${GEN[*]} -S \"$CMAKE_SRC\" -B \"$CMAKE_BUILD_DIR\" ${CFG[*]}"
