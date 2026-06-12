@@ -34,8 +34,8 @@
                 "cd \"$PACKAGE_DIR\" && test -f lib/libassimp.a || bash tools/build_assimp_min.sh --static"
             ],
             "preBuildCommands-windows": [
-                "cd /d \"%PACKAGE_DIR%\" && cmd /c \"git submodule update --init --recursive --quiet extern/assimp\"",
-                "cd /d \"%PACKAGE_DIR%\" && cmd /c \"if not exist lib\\\\assimp.lib bash tools/build_assimp_min.sh --static\""
+                "cd /d \"$PACKAGE_DIR\" && cmd /c \"git submodule update --init --recursive --quiet extern/assimp\"",
+                "cd /d \"$PACKAGE_DIR\" && cmd /c \"if not exist lib\\\\assimp.lib bash tools/build_assimp_min.sh --static\""
             ],
 
             "lflags-linux": [
@@ -43,8 +43,7 @@
                 "$PACKAGE_DIR/lib/libzlibstatic.a"
             ],
             "lflags-osx": [
-                "$PACKAGE_DIR/lib/libassimp.a",
-                "$PACKAGE_DIR/lib/libzlibstatic.a"
+                "$PACKAGE_DIR/lib/libassimp.a"
             ],
             "lflags-windows": [
                 "$PACKAGE_DIR/lib/assimp.lib",
@@ -52,7 +51,7 @@
             ],
 
             "libs-linux": ["stdc++", "m"],
-            "libs-osx": ["c++", "m"]
+            "libs-osx": ["c++", "m", "z"]
         }
     ]
 }

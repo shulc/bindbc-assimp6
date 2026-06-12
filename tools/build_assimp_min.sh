@@ -82,6 +82,14 @@ echo "==> output dir   : $OUT_DIR"
 echo "==> link mode    : $LINK (BUILD_SHARED_LIBS=$BUILD_SHARED)"
 echo "==> jobs         : $JOBS"
 
+# Assimp's vendored zlib 1.3.1 trips over AppleClang 21's TARGET_OS_MAC
+# predefines: zutil.h takes an old classic-Mac branch, macro-defines fdopen,
+# then breaks the SDK stdio.h declaration. Use the system zlib on Darwin.
+ASSIMP_BUILD_ZLIB=ON
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  ASSIMP_BUILD_ZLIB=OFF
+fi
+
 # --- configure ----------------------------------------------------------------
 # Formats vibe3d needs: OBJ, glTF, FBX — importer AND exporter. Everything else
 # off. NOTE: LWO stays OFF on purpose (vibe3d has its own LWO code).
@@ -106,7 +114,7 @@ CFG=(
   -DASSIMP_WARNINGS_AS_ERRORS=OFF
   -DASSIMP_BUILD_DRACO=OFF
 
-  -DASSIMP_BUILD_ZLIB=ON           # bundle zlib (libzlibstatic.a) — self-contained
+  -DASSIMP_BUILD_ZLIB=$ASSIMP_BUILD_ZLIB
 )
 
 echo
@@ -193,10 +201,12 @@ PROBE_OK=0
 if [[ "$LINK" == "static" ]]; then
   ZLIB_LIB=""
   [[ -e "$OUT_DIR/libzlibstatic.a" ]] && ZLIB_LIB="$OUT_DIR/libzlibstatic.a"
+  ZLIB_FLAGS=()
+  [[ -n "$ZLIB_LIB" ]] || ZLIB_FLAGS=(-lz)
   if g++ -I"$SRC/include" -I"$BUILD_DIR/include" \
         "$PROBE_DIR/probe.c" \
         "$OUT_DIR/libassimp.a" ${ZLIB_LIB:+"$ZLIB_LIB"} \
-        -lpthread -lm -ldl \
+        "${ZLIB_FLAGS[@]}" -lpthread -lm -ldl \
         -o "$PROBE_DIR/probe" 2> "$PROBE_DIR/link.log"; then
     PROBE_OK=1
   else
