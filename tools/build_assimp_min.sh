@@ -127,13 +127,16 @@ echo "==> collecting artifacts into $OUT_DIR"
 
 collected=()
 if [[ "$LINK" == "static" ]]; then
-  # main static lib
-  main="$(find "$BUILD_DIR" -name 'libassimp.a' | head -n1)"
-  [[ -n "$main" ]] || { echo "libassimp.a not found in build dir" >&2; exit 1; }
+  # main static lib. MSVC emits assimp.lib / zlibstatic.lib; GNU/Clang emit
+  # libassimp.a / libzlibstatic.a. Find whichever the toolchain produced and
+  # copy it through verbatim (keeping its native name) so the dub static-config
+  # lflags (libassimp.a on posix, assimp.lib on windows) resolve correctly.
+  main="$(find "$BUILD_DIR" \( -name 'libassimp.a' -o -name 'assimp.lib' \) | head -n1)"
+  [[ -n "$main" ]] || { echo "libassimp.a / assimp.lib not found in build dir" >&2; exit 1; }
   cp -f "$main" "$OUT_DIR/"
   collected+=("$OUT_DIR/$(basename "$main")")
   # bundled zlib static
-  zlib="$(find "$BUILD_DIR" -name 'libzlibstatic.a' | head -n1)"
+  zlib="$(find "$BUILD_DIR" \( -name 'libzlibstatic.a' -o -name 'zlibstatic.lib' \) | head -n1)"
   if [[ -n "$zlib" ]]; then
     cp -f "$zlib" "$OUT_DIR/"
     collected+=("$OUT_DIR/$(basename "$zlib")")
